@@ -1,9 +1,0 @@
-{
-  "name": "ent-family-planning-guide",
-  "private": true,
-  "version": "1.0.0",
-  "type": "module",
-  "dependencies": {
-    "@vercel/postgres": "^0.10.0"
-  }
-}
