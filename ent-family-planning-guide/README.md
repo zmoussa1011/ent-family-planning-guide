@@ -7,8 +7,10 @@ suggestion + reviewer-approval workflow.
 ## Stack
 
 - Static HTML/CSS/JS frontend ([index.html](index.html)) — no build step
-- Vercel serverless functions under [`api/`](api) for submissions and reviewer auth
-- Vercel Postgres for storage (see [schema.sql](schema.sql))
+- Netlify Functions (v2) under [`netlify/functions/`](netlify/functions) for
+  submissions and reviewer auth
+- Postgres for storage (see [schema.sql](schema.sql)) — works with Netlify DB
+  or any Postgres connection string
 
 ## Local setup
 
@@ -16,31 +18,32 @@ suggestion + reviewer-approval workflow.
    ```
    npm install
    ```
-2. Install the Vercel CLI if you don't have it: `npm i -g vercel`
-3. Link the project and connect Postgres:
+2. Install the Netlify CLI if you don't have it: `npm i -g netlify-cli`
+3. Link the project:
    ```
-   vercel link
+   netlify link
    ```
-   Then in the Vercel dashboard: **Storage → Create Database → Postgres**,
-   and connect it to this project. This wires up `POSTGRES_URL` automatically.
-4. Set the two secrets the dashboard doesn't generate for you (Project →
-   Settings → Environment Variables):
+4. Connect a database: in the Netlify dashboard, **Project → Database** (or
+   **Integrations**) → set up **Netlify DB** (free, Neon-backed), or connect
+   your own Postgres and add its connection string as `DATABASE_URL` under
+   **Site configuration → Environment variables**.
+5. Set the two secrets the database setup doesn't generate for you:
    - `REVIEWER_PASSCODE` — the passcode reviewers type to unlock the queue
    - `SESSION_SECRET` — a random string, e.g. `openssl rand -hex 32`
-5. Pull env vars locally and run the dev server:
+6. Pull env vars locally and run the dev server:
    ```
-   vercel env pull
-   vercel dev
+   netlify env:pull
+   netlify dev
    ```
-6. Create the table (once) by running [schema.sql](schema.sql) against the
-   database — easiest via the "Query" tab in the Vercel Postgres dashboard,
-   or `psql "$POSTGRES_URL" -f schema.sql` locally.
+7. Create the table (once) by visiting `/api/admin/init-db` after the site is
+   deployed and connected to a database — it runs the same statement as
+   [schema.sql](schema.sql), safe to call more than once.
 
 ## Deploy
 
-Push this repo to GitHub and import it in Vercel (same flow as the workout
-app) — no framework preset needed, Vercel auto-detects the static file +
-`/api` functions layout.
+Push this repo to GitHub and import it in Netlify (**Add new site → Import an
+existing project**) — `netlify.toml` in this repo tells Netlify where the
+static files and functions live, no manual configuration needed.
 
 ## Notes
 
